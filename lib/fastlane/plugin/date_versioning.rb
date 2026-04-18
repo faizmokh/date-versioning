@@ -1,0 +1,6 @@
+require 'fastlane/action'
+require_relative 'date_versioning/version'
+require_relative 'date_versioning/date_version_formatter'
+require_relative 'date_versioning/marketing_version_validator'
+require_relative 'date_versioning/marketing_version_comparer'
+require_relative 'date_versioning/helper/date_versioning_helper'

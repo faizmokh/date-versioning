@@ -1,0 +1,4 @@
+.worktrees/
+/.bundle/
+/vendor/bundle/
+*.gem
