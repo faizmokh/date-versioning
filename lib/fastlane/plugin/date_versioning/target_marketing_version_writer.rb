@@ -14,6 +14,8 @@ module Fastlane
         end
 
         project.save
+      rescue RuntimeError => e
+        raise ArgumentError, e.message
       end
     end
   end

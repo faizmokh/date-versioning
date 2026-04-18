@@ -19,6 +19,8 @@ module Fastlane
         raise ArgumentError, "Build configurations do not agree: #{versions}" if versions.values.uniq.length != 1
 
         versions.values.first
+      rescue RuntimeError => e
+        raise ArgumentError, e.message
       end
     end
   end

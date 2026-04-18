@@ -81,6 +81,12 @@ RSpec.describe Fastlane::Actions::SetMarketingVersionFromDateAction do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /Target not found/)
     end
 
+    it 'fails with a user-facing error when the project path is invalid' do
+      expect do
+        run_action(xcodeproj: 'missing/Project.xcodeproj')
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+
     it 'writes a lower candidate when fail_if_version_decreases is false' do
       allow(Fastlane::DateVersioning::DateVersionFormatter).to receive(:call).and_return('2026.4.17')
 

@@ -29,7 +29,7 @@ set_marketing_version_from_date(
 
 - `xcodeproj`: Required. Path to the `.xcodeproj` file to update.
 - `target_name`: Required. Target whose `MARKETING_VERSION` will be read and written.
-- `timezone`: Optional. IANA timezone identifier used when formatting the date version. Default: `"UTC"`. Invalid timezone identifiers cause the action to fail.
+- `timezone`: Optional. IANA timezone identifier used when formatting the date version. Default: `"UTC"`. Invalid timezone identifiers cause the action to fail when the date-based version is being generated.
 - `skip_if_same`: Optional. Skip writing when the candidate version matches the current version. Default: `true`.
 - `fail_if_version_decreases`: Optional. Fail when the candidate version is lower than the current version. Default: `true`.
 - `dry_run`: Optional. Compute and log the candidate version without writing it. Default: `false`.
