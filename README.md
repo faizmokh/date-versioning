@@ -1,72 +1,68 @@
 # fastlane-plugin-date_versioning
 
-Fastlane plugin for setting an iOS target's `MARKETING_VERSION` from the current date.
+Set an iOS target's `MARKETING_VERSION` from the current date.
 
-## Scope
+## Install in Your App
 
-- This plugin only manages the marketing version.
-- Build number strategy is separate and should be handled by your existing build-number flow.
-- Current support is limited to `.xcodeproj` projects that store the target marketing version in `MARKETING_VERSION`.
-- If you ship more than once on the same day, the second release may need `override_version` because the default date-based value will be unchanged.
-
-## Action
-
-Use the public Fastlane action `set_marketing_version_from_date`.
+Add this to `fastlane/Pluginfile`:
 
 ```ruby
-set_marketing_version_from_date(
-  xcodeproj: "MyApp.xcodeproj",
-  target_name: "MyApp",
-  timezone: "UTC",
-  skip_if_same: true,
-  fail_if_version_decreases: true,
-  dry_run: false,
-  override_version: nil
-)
+gem "fastlane-plugin-date_versioning", git: "https://github.com/<org>/date-versioning.git"
 ```
 
-### Parameters
+Replace the git URL with your plugin repository, then run:
 
-- `xcodeproj`: Required. Path to the `.xcodeproj` file to update.
-- `target_name`: Required. Target whose `MARKETING_VERSION` will be read and written.
-- `timezone`: Optional. IANA timezone identifier used when formatting the date version. Default: `"UTC"`. Invalid timezone identifiers cause the action to fail when the date-based version is being generated.
-- `skip_if_same`: Optional. Skip writing when the candidate version matches the current version. Default: `true`.
-- `fail_if_version_decreases`: Optional. Fail when the candidate version is lower than the current version. Default: `true`.
-- `dry_run`: Optional. Compute and log the candidate version without writing it. Default: `false`.
-- `override_version`: Optional. Use this explicit marketing version instead of generating one from the current date.
+```bash
+bundle install
+```
 
-## Behavior
-
-- The generated version format is `YYYY.M.D`.
-- The action reads `MARKETING_VERSION` from all build configurations on the selected target.
-- The action fails if the target is missing, `MARKETING_VERSION` is missing, or build configurations disagree on the current marketing version.
-- The action writes one consistent `MARKETING_VERSION` back to every build configuration on the target.
-- `override_version` must still be a numeric dotted marketing version such as `2026.4.19`.
-
-## Examples
-
-Set today's UTC-based marketing version:
+## Use in Fastfile
 
 ```ruby
-lane :release do
-  set_marketing_version_from_date(
-    xcodeproj: "MyApp.xcodeproj",
-    target_name: "MyApp"
-  )
+platform :ios do
+  lane :release do
+    set_marketing_version_from_date(
+      xcodeproj: "MyApp.xcodeproj",
+      target_name: "MyApp",
+      timezone: "Asia/Kuala_Lumpur",
+      skip_if_same: true,
+      fail_if_version_decreases: true
+    )
+
+    increment_build_number(
+      xcodeproj: "MyApp.xcodeproj"
+    )
+  end
 end
 ```
 
-Use a local timezone for the date boundary:
+## What It Does
 
-```ruby
-set_marketing_version_from_date(
-  xcodeproj: "MyApp.xcodeproj",
-  target_name: "MyApp",
-  timezone: "Asia/Kuala_Lumpur"
-)
-```
+- Updates `MARKETING_VERSION` only
+- Reads and writes all build configurations for one target
+- Works with `.xcodeproj` projects that store the version in `MARKETING_VERSION`
+- Leaves build number handling to your existing Fastlane flow
 
-Preview the next version without writing it:
+## Parameters
+
+- `xcodeproj`: Required. Path to the `.xcodeproj` file.
+- `target_name`: Required. Target to update.
+- `timezone`: Optional. IANA timezone identifier. Default: `"UTC"`.
+- `skip_if_same`: Optional. Skip writing when the version is unchanged. Default: `true`.
+- `fail_if_version_decreases`: Optional. Fail when the candidate version is lower. Default: `true`.
+- `dry_run`: Optional. Log the candidate version without writing it. Default: `false`.
+- `override_version`: Optional. Use an explicit version instead of the date.
+
+## Notes
+
+- Generated format: `YYYY.M.D`
+- Invalid timezone identifiers fail only when generating the date-based version
+- If you ship more than once on the same day, use `override_version`
+- This plugin does not manage build numbers
+
+## Examples
+
+Dry run:
 
 ```ruby
 set_marketing_version_from_date(
@@ -76,7 +72,7 @@ set_marketing_version_from_date(
 )
 ```
 
-Force a same-day follow-up release version:
+Same-day follow-up release:
 
 ```ruby
 set_marketing_version_from_date(
@@ -88,20 +84,8 @@ set_marketing_version_from_date(
 
 ## Development
 
-Install dependencies:
-
 ```bash
 bundle install
-```
-
-Run specs directly:
-
-```bash
 bundle exec rspec
-```
-
-Run the default rake task:
-
-```bash
 bundle exec rake
 ```
