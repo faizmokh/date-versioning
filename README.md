@@ -2,7 +2,7 @@
 
 Fastlane plugin gem: `fastlane-plugin-date_versioning`
 
-Set an iOS target's `MARKETING_VERSION` from the current date.
+Set one or more iOS targets' `MARKETING_VERSION` from the current date.
 
 ## Install in Your App
 
@@ -49,7 +49,7 @@ end
 ## Parameters
 
 - `xcodeproj`: Required. Path to the `.xcodeproj` file.
-- `target_name`: Required. Target name string or array of target names to update.
+- `target_name`: Required. Pass either a single target name string or an array of target names.
 - `timezone`: Optional. IANA timezone identifier. Default: `"UTC"`.
 - `skip_if_same`: Optional. Skip writing when the version is unchanged. Default: `true`.
 - `fail_if_version_decreases`: Optional. Fail when the candidate version is lower. Default: `true`.
@@ -60,12 +60,15 @@ end
 
 - Generated format: `YYYY.M.D`
 - Invalid timezone identifiers fail only when generating the date-based version
+- Single-target usage still works with a string `target_name`
+- `skip_if_same` skips only when every requested target already matches the candidate version
+- `fail_if_version_decreases` fails when the candidate would decrease any requested target
 - If you ship more than once on the same day, use `override_version`
 - This plugin does not manage build numbers
 
 ## Examples
 
-Dry run:
+Single target string:
 
 ```ruby
 set_marketing_version_from_date(
@@ -75,7 +78,7 @@ set_marketing_version_from_date(
 )
 ```
 
-Multiple targets:
+Multiple target array:
 
 ```ruby
 set_marketing_version_from_date(
