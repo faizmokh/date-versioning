@@ -109,5 +109,81 @@ RSpec.describe Fastlane::Actions::SetMarketingVersionFromDateAction do
         Fastlane::DateVersioning::TargetMarketingVersionReader.call(xcodeproj_path: project_path, target_name: 'Demo')
       ).to eq('2026.4.18')
     end
+
+    it 'updates multiple targets when target_name is an array' do
+      project_path = SpecSupport::ProjectFactory.create!(
+        targets: {
+          'App' => '2026.4.18',
+          'Widget' => '2026.4.18'
+        }
+      )
+
+      allow(Fastlane::DateVersioning::DateVersionFormatter).to receive(:call).and_return('2026.4.19')
+
+      result = described_class.run(
+        xcodeproj: project_path,
+        target_name: %w[App Widget],
+        timezone: 'UTC',
+        skip_if_same: true,
+        fail_if_version_decreases: true,
+        dry_run: false,
+        override_version: nil
+      )
+
+      expect(result).to eq('2026.4.19')
+      expect(
+        Fastlane::DateVersioning::TargetMarketingVersionReader.call(xcodeproj_path: project_path, target_name: 'App')
+      ).to eq('2026.4.19')
+      expect(
+        Fastlane::DateVersioning::TargetMarketingVersionReader.call(xcodeproj_path: project_path, target_name: 'Widget')
+      ).to eq('2026.4.19')
+    end
+
+    it 'skips only when every target already matches the candidate version' do
+      project_path = SpecSupport::ProjectFactory.create!(
+        targets: {
+          'App' => '2026.4.18',
+          'Widget' => '2026.4.18'
+        }
+      )
+
+      allow(Fastlane::DateVersioning::DateVersionFormatter).to receive(:call).and_return('2026.4.18')
+      expect(Fastlane::DateVersioning::TargetMarketingVersionProjectEditor).not_to receive(:write_version)
+
+      result = described_class.run(
+        xcodeproj: project_path,
+        target_name: %w[App Widget],
+        timezone: 'UTC',
+        skip_if_same: true,
+        fail_if_version_decreases: true,
+        dry_run: false,
+        override_version: nil
+      )
+
+      expect(result).to eq('2026.4.18')
+    end
+
+    it 'fails when the candidate would decrease any target' do
+      project_path = SpecSupport::ProjectFactory.create!(
+        targets: {
+          'App' => '2026.4.18',
+          'Widget' => '2026.4.20'
+        }
+      )
+
+      allow(Fastlane::DateVersioning::DateVersionFormatter).to receive(:call).and_return('2026.4.19')
+
+      expect do
+        described_class.run(
+          xcodeproj: project_path,
+          target_name: %w[App Widget],
+          timezone: 'UTC',
+          skip_if_same: true,
+          fail_if_version_decreases: true,
+          dry_run: false,
+          override_version: nil
+        )
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /Refusing to decrease MARKETING_VERSION/)
+    end
   end
 end

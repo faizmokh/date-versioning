@@ -25,7 +25,7 @@ platform :ios do
   lane :release do
     set_marketing_version_from_date(
       xcodeproj: "MyApp.xcodeproj",
-      target_name: "MyApp",
+      target_name: ["MyApp", "MyWidgetExtension"],
       timezone: "Asia/Kuala_Lumpur",
       skip_if_same: true,
       fail_if_version_decreases: true
@@ -41,14 +41,15 @@ end
 ## What It Does
 
 - Updates `MARKETING_VERSION` only
-- Reads and writes all build configurations for one target
+- Reads and writes all build configurations for one or more targets
+- Validates every requested target before saving changes
 - Works with `.xcodeproj` projects that store the version in `MARKETING_VERSION`
 - Leaves build number handling to your existing Fastlane flow
 
 ## Parameters
 
 - `xcodeproj`: Required. Path to the `.xcodeproj` file.
-- `target_name`: Required. Target to update.
+- `target_name`: Required. Target name string or array of target names to update.
 - `timezone`: Optional. IANA timezone identifier. Default: `"UTC"`.
 - `skip_if_same`: Optional. Skip writing when the version is unchanged. Default: `true`.
 - `fail_if_version_decreases`: Optional. Fail when the candidate version is lower. Default: `true`.
@@ -71,6 +72,15 @@ set_marketing_version_from_date(
   xcodeproj: "MyApp.xcodeproj",
   target_name: "MyApp",
   dry_run: true
+)
+```
+
+Multiple targets:
+
+```ruby
+set_marketing_version_from_date(
+  xcodeproj: "MyApp.xcodeproj",
+  target_name: ["MyApp", "MyWidgetExtension"]
 )
 ```
 
