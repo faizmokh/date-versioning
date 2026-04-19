@@ -1,4 +1,6 @@
-# fastlane-plugin-date_versioning
+# date_versioning
+
+Fastlane plugin gem: `fastlane-plugin-date_versioning`
 
 Set an iOS target's `MARKETING_VERSION` from the current date.
 
@@ -7,7 +9,7 @@ Set an iOS target's `MARKETING_VERSION` from the current date.
 Add this to `fastlane/Pluginfile`:
 
 ```ruby
-gem "fastlane-plugin-date_versioning", git: "https://github.com/<org>/date-versioning.git"
+gem "fastlane-plugin-date_versioning", git: "https://github.com/faizmokh/date_versioning.git"
 ```
 
 Replace the git URL with your plugin repository, then run:
