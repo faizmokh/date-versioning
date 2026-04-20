@@ -54,7 +54,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :xcodeproj, optional: false, type: String,
                                        description: 'Path to the .xcodeproj to update'),
-          FastlaneCore::ConfigItem.new(key: :target_name, optional: false,
+          FastlaneCore::ConfigItem.new(key: :target_name, optional: false, is_string: false,
                                        description: 'Target or targets whose MARKETING_VERSION will be set',
                                        verify_block: proc do |value|
                                          next if value.is_a?(String)

@@ -185,5 +185,38 @@ RSpec.describe Fastlane::Actions::SetMarketingVersionFromDateAction do
         )
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /Refusing to decrease MARKETING_VERSION/)
     end
+
+    it 'accepts an array target_name through the Fastlane DSL helper' do
+      project_path = SpecSupport::ProjectFactory.create!(
+        targets: {
+          'App' => '2026.4.18',
+          'Widget' => '2026.4.18'
+        }
+      )
+
+      fastfile = Fastlane::FastFile.new.parse(<<~FASTFILE)
+        platform :ios do
+          lane :test_multi_target_dsl do
+            set_marketing_version_from_date(
+              xcodeproj: #{project_path.inspect},
+              target_name: ['App', 'Widget'],
+              timezone: 'UTC',
+              skip_if_same: true,
+              fail_if_version_decreases: true,
+              dry_run: false,
+              override_version: '2026.4.19'
+            )
+          end
+        end
+      FASTFILE
+
+      expect(fastfile.runner.execute(:test_multi_target_dsl, :ios, nil)).to eq('2026.4.19')
+      expect(
+        Fastlane::DateVersioning::TargetMarketingVersionReader.call(xcodeproj_path: project_path, target_name: 'App')
+      ).to eq('2026.4.19')
+      expect(
+        Fastlane::DateVersioning::TargetMarketingVersionReader.call(xcodeproj_path: project_path, target_name: 'Widget')
+      ).to eq('2026.4.19')
+    end
   end
 end
